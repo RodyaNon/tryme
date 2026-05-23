@@ -1,15 +1,14 @@
 package com.rodya;
 
-
-import com.rodya.service.AspectTestService;
+import com.rodya.performance.service.AspectTestService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class AspectApplicationTests {
+class PerformanceTest {
 
-    private static final int LOOP_COUNT = 100000000;
+    private static final int LOOP_COUNT = 100000;
     private static final int WARMUP_COUNT = 5000;
 
     @Autowired

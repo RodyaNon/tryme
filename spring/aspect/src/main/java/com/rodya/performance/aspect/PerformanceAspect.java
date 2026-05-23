@@ -1,4 +1,4 @@
-package com.rodya.aspect;
+package com.rodya.performance.aspect;
 
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.*;
@@ -8,13 +8,13 @@ import org.springframework.stereotype.Component;
 @Component
 public class PerformanceAspect {
 
-    @Pointcut("@annotation(com.rodya.aspect.annotation.TestAround)")
+    @Pointcut("@annotation(com.rodya.performance.aspect.annotation.TestAround)")
     public void testAround() {
     }
-    @Pointcut("@annotation(com.rodya.aspect.annotation.TestBefore)")
+    @Pointcut("@annotation(com.rodya.performance.aspect.annotation.TestBefore)")
     public void testBefore() {
     }
-    @Pointcut("@annotation(com.rodya.aspect.annotation.TestAfter)")
+    @Pointcut("@annotation(com.rodya.performance.aspect.annotation.TestAfter)")
     public void testAfter() {
     }
 

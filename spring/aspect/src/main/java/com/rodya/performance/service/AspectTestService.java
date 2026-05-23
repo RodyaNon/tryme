@@ -1,8 +1,8 @@
-package com.rodya.service;
+package com.rodya.performance.service;
 
-import com.rodya.aspect.annotation.TestAfter;
-import com.rodya.aspect.annotation.TestAround;
-import com.rodya.aspect.annotation.TestBefore;
+import com.rodya.performance.aspect.annotation.TestAfter;
+import com.rodya.performance.aspect.annotation.TestAround;
+import com.rodya.performance.aspect.annotation.TestBefore;
 import org.springframework.stereotype.Service;
 
 @Service
