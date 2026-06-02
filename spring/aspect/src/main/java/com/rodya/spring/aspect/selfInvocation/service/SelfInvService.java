@@ -20,7 +20,7 @@ public class SelfInvService {
 
     public void test(){
         System.out.println("test");
-       selfInvService.inner();
+        selfInvService.inner();
     }
 
     public void test2(){

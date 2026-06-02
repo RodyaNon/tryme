@@ -6,15 +6,16 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
         <version>4.0.6</version>
+        <relativePath/> <!-- lookup parent from repository -->
     </parent>
 
     <groupId>com.rodya</groupId>
-    <artifactId>spring</artifactId>
+    <artifactId>mysql</artifactId>
     <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <modules>
-        <module>aspect</module>
+        <module>db-router</module>
     </modules>
 
     <developers>
@@ -37,7 +38,7 @@
         <java.version>21</java.version>
         <lombok.version>1.18.34</lombok.version>
     </properties>
-    
+
     <dependencyManagement>
         <dependencies>
             <dependency>
@@ -49,7 +50,6 @@
         </dependencies>
     </dependencyManagement>
 
-    
     <build>
         <plugins>
             <plugin>
