@@ -1,3 +1,29 @@
 spring:
   application:
     name: db-router
+
+# 数据库路由配置
+rodya-db-router:
+  jdbc:
+    datasource:
+      dbCount: 3
+      tbCount: 2
+      routerKey: userId
+      list: db01,db02,db03
+      
+      # 全局配置
+      global:
+        driver-class-name: com.mysql.cj.jdbc.Driver
+        username: ${DB_USER}
+        password: ${DB_PWD}
+        pool:
+          minimum-idle: 5
+          maximum-pool-size: 20
+          connection-timeout: 30000
+      db01:
+        url: ${DB01_URL}
+      db02:
+        url: ${DB02_URL}
+      db03:
+        url: ${DB03_URL}
+
