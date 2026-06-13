@@ -1,0 +1,47 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: tryme-gateway
+
+# 网关配置
+gateway:
+  # 默认超时时间（毫秒）
+  default-timeout: 30000
+  # 是否启用负载均衡
+  enable-load-balance: true
+  
+  # 路由规则配置
+  routes:
+    - id: user-service
+      path: /api/user/**
+      target-url: http://localhost:8081
+      service-name: user-service
+      enabled: true
+      retry-count: 3
+      filters:
+        - name: authentication
+          args:
+            required: true
+        - name: rate-limiting
+          args:
+            max-requests: 100
+            window-seconds: 60
+    
+    - id: order-service
+      path: /api/order/**
+      target-url: http://localhost:8082
+      service-name: order-service
+      enabled: true
+      retry-count: 2
+      filters:
+        - name: authentication
+          args:
+            required: true
+  
+  # 全局过滤器配置
+  global-filters:
+    logging:
+      enabled: true
+      log-level: INFO

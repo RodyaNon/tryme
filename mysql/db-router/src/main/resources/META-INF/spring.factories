@@ -1,1 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.rodya.mysql.dbrouter.config.DataSourceAutoConfig
