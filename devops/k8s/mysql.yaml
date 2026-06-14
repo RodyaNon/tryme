@@ -1,0 +1,98 @@
+# ========== 1. PVC 持久化存储（保存MySQL数据，防止Pod重建丢失数据） ==========
+apiVersion: v1
+kind: PersistentVolumeClaim  # 资源类型：PVC 存储申请
+metadata:
+  name: tryme-mysql-data-pvc       # PVC名称
+  namespace: tryme           # 归属的命名空间
+spec:
+  accessModes:
+    - ReadWriteOnce          # 访问模式：单个节点读写（最常用）
+  resources:
+    requests:
+      storage: 5Gi          # 申请存储空间：10GB，可自行调整
+---
+
+# ========== 2. Deployment 部署MySQL主容器 ==========
+apiVersion: apps/v1           # Deployment 固定 API 版本
+kind: Deployment             # 资源类型：无状态应用部署
+metadata:
+  name: tryme-mysql        # Deployment 名称
+  namespace: tryme           # 归属命名空间
+  labels:
+    app: tryme-mysql               # 标签，用于Service关联Pod
+spec:
+  replicas: 1                 # 副本数：单机MySQL只需要1个Pod
+  selector:
+    matchLabels:
+      app: tryme-mysql              # 匹配Pod标签，和上面labels一致
+  template:                   # Pod 模板（真正运行的容器配置）
+    metadata:
+      labels:
+        app: tryme-mysql            # Pod 标签，被Service识别
+    spec:
+      containers:             # 容器列表，一个Pod可多个容器
+        - name: tryme-mysql-container # 容器名称
+          image: docker.m.daocloud.io/mysql:8.0      # 使用的镜像：mysql 8.0
+          imagePullPolicy: IfNotPresent  # 拉取策略：本地有就用本地，没有再拉取
+          ports:
+            - containerPort: 3306 # 容器内部端口，MySQL默认3306
+          # 环境变量（MySQL初始化配置）
+          env:
+            - name: MYSQL_ROOT_PASSWORD  # root账号密码环境变量
+              value: "123456"      # 自定义密码，务必修改复杂度
+            - name: MYSQL_DATABASE       # 启动时自动创建的数据库（后面给nacos用）
+              value: "nacos_config"
+            - name: MYSQL_CHARSET        # 字符集
+              value: "utf8mb4"
+            - name: MYSQL_COLLATION      # 排序规则
+              value: "utf8mb4_unicode_ci"
+
+          # 挂载存储：把容器内数据目录绑定到PVC
+          volumeMounts:
+            - name: tryme-mysql-data-volume    # 卷名称，和下方volumes对应
+              mountPath: /var/lib/mysql  # MySQL数据存储目录（固定路径）
+
+          # 资源限制：防止MySQL占用过多服务器资源
+          resources:
+            requests:
+              cpu: 200m    # 最少占用CPU：0.1核
+              memory: 256Mi # 最少占用内存：128MB
+            limits:
+              cpu: 500m   # 最大限制CPU：0.5核
+              memory: 512Mi  # 最大限制内存：256M
+
+          # 存活探针：检查容器是否正常运行，挂了就重启
+          livenessProbe:
+            tcpSocket:
+              port: 3306   # 探测3306端口
+            initialDelaySeconds: 30  # 容器启动30秒后开始探测
+            periodSeconds: 10         # 每10秒探测一次
+
+          # 就绪探针：检查容器是否可以对外提供服务
+          readinessProbe:
+            tcpSocket:
+              port: 3306
+            initialDelaySeconds: 10
+            periodSeconds: 5
+
+      # 定义卷：关联上面创建的PVC
+      volumes:
+        - name: tryme-mysql-data-volume      # 卷名称，和volumeMounts对应
+          persistentVolumeClaim:
+            claimName: tryme-mysql-data-pvc # 绑定前面的PVC名称
+---
+
+# ========== 3. Service 暴露MySQL服务 ==========
+apiVersion: v1
+kind: Service              # 资源类型：服务，统一访问入口
+metadata:
+  name: tryme-mysql-svc         # Service名称
+  namespace: tryme
+spec:
+  selector:
+    app: tryme-mysql            # 匹配Pod标签，关联上面MySQL容器
+  ports:
+    - port: 3306            # Service内部端口（集群内访问用）
+      targetPort: 3306      # 转发到容器的3306端口
+      nodePort: 30306       # 节点端口（外部服务器/本地Navicat连接）
+  type: NodePort            # 服务类型：节点端口，外网可通过节点IP+端口访问

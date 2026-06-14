@@ -2,8 +2,21 @@ server:
   port: 8080
 
 spring:
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    password: 123456
+    database: 0
+    timeout: 3000ms
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        min-idle: 2
+        max-wait: 1000ms
   application:
     name: tryme-gateway
+
 
 # 网关配置
 gateway:
